@@ -46,8 +46,6 @@ class BarChart extends Component {
         }
       });
 
-      console.log(filteredData)
-
       let groupedData = d3.rollup(filteredData, v => d3.mean(v, d => d.target), d => d.selected)
 
       let margin = {top: 20, right: 20, bottom: 30, left: 40},
@@ -80,6 +78,8 @@ class BarChart extends Component {
         return a[1] - b[1];
       })
 
+      console.log(dataArray)
+
       svg.selectAll(".bar")
         .data(dataArray)
         .join("rect")
@@ -97,11 +97,19 @@ class BarChart extends Component {
         .attr("fill", "steelblue");
 
       svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + (height) + ")")
         .call(d3.axisBottom(x));
       
       svg.append("g")
         .call(d3.axisLeft(y));
+
+      svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x",0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Average " + target);
 
     }
   }
