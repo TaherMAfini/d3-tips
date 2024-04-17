@@ -38,7 +38,6 @@ class BarChart extends Component {
 
     if (selected !== "" && target !== "") {
 
-      console.log("Generating Chart, ", selected, target)
       let filteredData = data.map(function (d) {
         return {
           target: d[target],
@@ -58,58 +57,59 @@ class BarChart extends Component {
       let y = d3.scaleLinear()
         .range([height, 0]);
 
-      let svg = d3.select("#bar-chart")
-      if(!svg.empty()) {        
-        svg.remove()
-      }
 
-      svg = d3.select(".barChart").append("svg")
-        .attr("id", "bar-chart")
+      let container = d3.select("#bar-chart")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform","translate(" + margin.left + "," + margin.top + ")")
-      x.domain(groupedData.keys());
-      y.domain([0, d3.max(groupedData.values())]);
+        .select(".g_1")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-      let dataArray = Array.from(groupedData)
+        //X axis
 
-      dataArray = dataArray.sort(function(a, b) {
-        return a[1] - b[1];
-      })
+        let x_data = Array.from(groupedData.keys());
+        let x_scale = d3.scaleBand()
+          .domain(x_data)
+          .range([margin.left, width])
+          .padding(0.2);
 
-      console.log(dataArray)
+        container.selectAll(".x-axis-g")
+          .data([0])
+          .join("g")
+          .attr("class", "x-axis-g")
+          .attr("transform", `translate(0, ${height})`)
+          .call(d3.axisBottom(x_scale));
 
-      svg.selectAll(".bar")
-        .data(dataArray)
-        .join("rect")
-        .attr("class", "bar")
-        .attr("x", function (d) {
-          return x(d[0]);
-        })
-        .attr("width", x.bandwidth())
-        .attr("y", function (d) {
-          return y(d[1]);
-        })
-        .attr("height", function (d) {
-          return height - y(d[1]);
-        })
-        .attr("fill", "steelblue");
+        //Y axis
+        let y_data = Array.from(groupedData.values());
+        let y_scale = d3.scaleLinear()
+          .domain([0, d3.max(y_data)])
+          .range([height, 0]);
 
-      svg.append("g")
-        .attr("transform", "translate(0," + (height) + ")")
-        .call(d3.axisBottom(x));
-      
-      svg.append("g")
-        .call(d3.axisLeft(y));
+        container.selectAll(".y-axis-g")
+          .data([0])
+          .join("g")
+          .attr("class", "y-axis-g")
+          .attr("transform", `translate(${margin.left}, 0)`)
+          .call(d3.axisLeft(y_scale));
+          
+        //Bars
+        container.selectAll("rect")
+          .data(groupedData)
+          .join("rect")
+          .attr("x", d => x_scale(d[0]))
+          .attr("y", d => y_scale(d[1]))
+          .attr("width", x_scale.bandwidth())
+          .attr("height", d => height - y_scale(d[1]))
+          .attr("fill", "steelblue");
 
-      svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left)
-        .attr("x",0 - (height / 2))
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .text("Average " + target);
+        //Y axis label
+        container.selectAll(".y-axis-label")
+          .data([0])
+          .join("text")
+          .attr("class", "y-axis-label")
+          .attr("transform", `translate(0, ${height / 2}) rotate(-90)`)
+          .attr("text-anchor", "middle")
+          .text("Mean " + target);
 
     }
   }
@@ -118,6 +118,9 @@ class BarChart extends Component {
     return (
       <div class="barChart">
         <div class="bar-radio my-2"></div>
+        <svg id="bar-chart">
+          <g className="g_1"></g>
+        </svg>
       </div>
     );
   }
