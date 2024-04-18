@@ -29,7 +29,10 @@ class CorrMat extends Component {
     this.state = {}
   }
 
-  
+  handleScatterColumns = (rect) => {
+    let columns = [rect.getAttribute("col1"), rect.getAttribute("col2")]
+    this.props.scatter_columns(columns)
+  }
 
   componentDidUpdate() {
     let self = this
@@ -64,6 +67,7 @@ class CorrMat extends Component {
     })
 
     let grid = []
+    let correlations = []
 
     for (let i = 0; i < num_colums; i++) {
       for (let j = 0; j < num_colums; j++) {
@@ -74,10 +78,11 @@ class CorrMat extends Component {
           x: j*80,
           y: i*80
         })
+        correlations.push(corr_data[i][numeric_columns[j]])
       }
     }
 
-    console.log(grid)
+
     
     let container = d3.select("#corr-matrix")
       .attr("width", width + margin.left + margin.right)
@@ -134,8 +139,15 @@ class CorrMat extends Component {
             })
             .attr("width", 80)
             .attr("height", 80)
+            .attr("value", d => d.value)
+            .attr("col1", d => d.col1)
+            .attr("col2", d => d.col2)
             .attr("fill", function (d) {
               return d3.interpolatePlasma(d.value)
+            })
+            .on("click", function (d) {
+              let rect = d.srcElement
+              self.handleScatterColumns(rect)
             })
           
           g.append("text")
@@ -150,6 +162,7 @@ class CorrMat extends Component {
             .text(function (d) {
               return d.value
             })
+            .attr('pointer-events', 'none')
         }
       )
 
@@ -167,7 +180,7 @@ class CorrMat extends Component {
         .attr("y2", "100%")
 
       linearGradient.selectAll("stop")
-        .data(d3.range(0, 1.1, 0.1))
+        .data(d3.range(-1, 1.1, 0.1))
         .join("stop")
         .attr("offset", d => `${d * 100}%`)
         .attr("stop-color", d => d3.interpolatePlasma(d))
@@ -180,12 +193,12 @@ class CorrMat extends Component {
 
       
       let colorbar = d3.scaleLinear()
-        .domain([1, -1])
+        .domain([d3.max(correlations), 0])
         .range([0, 240])
 
       container.append("g")
         .attr("transform", `translate(320, 0)`)
-        .call(d3.axisRight(colorbar).ticks(8).tickSize(0))
+        .call(d3.axisRight(colorbar).ticks(5).tickSize(0))
         .style("font-size", "15px")
         .selectAll(".domain").remove()
 

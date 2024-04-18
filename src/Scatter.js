@@ -11,8 +11,8 @@ class Scatter extends Component {
   render() {
     return (
       <div class="scatter">
-        <svg id="scatter">
-          <text x="50%" y="50%" text-anchor="middle" alignment-baseline="middle">Scatterplot: {this.props.target}</text>
+        <svg id="scatter" width="500" height="300">
+          <text x="50%" y="50%" text-anchor="middle" alignment-baseline="middle">Scatterplot: {this.props.target}, col1: {this.props.scatter_columns[0]}, col2: {this.props.scatter_columns[1]}</text>
         </svg>
       </div>
     );

@@ -11,7 +11,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {data: [], target: "", numeric_columns: []}
+    this.state = {data: [], target: "", numeric_columns: [], scatter_columns: []}
   }
 
   componentDidMount() {
@@ -43,6 +43,10 @@ class App extends Component {
     this.setState({target: target})
   }
 
+  handleScatterColumns = (columns) => {
+    this.setState({scatter_columns: columns})
+  }
+
   render() {
     return (
       <div className="container-fluid text-center">
@@ -54,12 +58,12 @@ class App extends Component {
             <BarChart data1={this.state.data} target={this.state.target}></BarChart>
           </div>
           <div className="col">
-            <CorrMat data1={this.state.data} target={this.state.target}></CorrMat>
+            <CorrMat data1={this.state.data} target={this.state.target} scatter_columns={this.handleScatterColumns}></CorrMat>
           </div>
         </div>
         <div className="row">
           <div className="col">
-            <Scatter data1={this.state.data} target={this.state.target}></Scatter>
+            <Scatter data1={this.state.data} target={this.state.target} scatter_columns={this.state.scatter_columns}></Scatter>
           </div>
         </div>
       </div>
