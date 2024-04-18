@@ -23,7 +23,7 @@ class BarChart extends Component {
     });
 
     if(document.querySelector(".bar-radio").innerHTML === "") {
-      cat_columns.map((col) => {
+      cat_columns.forEach((col) => {
         document.querySelector(".bar-radio").innerHTML += `<input type="radio" class="ms-2" name="bar-radio" value="${col}"></input><label class="me-2" for="${col}">${col}</label>`
       })
     }
@@ -45,7 +45,11 @@ class BarChart extends Component {
         }
       });
 
-      let groupedData = d3.rollup(filteredData, v => d3.mean(v, d => d.target), d => d.selected)
+      let groupedData = d3.flatRollup(
+        filteredData,
+        (d) => d3.mean(d, (g) => g.target),
+        (d) => d.selected,
+      )
 
       let margin = {top: 20, right: 20, bottom: 30, left: 40},
         width = 500 - margin.left - margin.right,
@@ -60,7 +64,7 @@ class BarChart extends Component {
 
         //X axis
 
-        let x_data = Array.from(groupedData.keys());
+        let x_data = groupedData.map(d => d[0]);
         let x_scale = d3.scaleBand()
           .domain(x_data)
           .range([margin.left, width])
@@ -74,7 +78,7 @@ class BarChart extends Component {
           .call(d3.axisBottom(x_scale));
 
         //Y axis
-        let y_data = Array.from(groupedData.values());
+        let y_data = groupedData.map(d => d[1]);
         let y_scale = d3.scaleLinear()
           .domain([0, d3.max(y_data)])
           .range([height, 0]);
@@ -111,7 +115,7 @@ class BarChart extends Component {
   render() {
     return (
       <div class="barChart">
-        <div class="bar-radio my-2"></div>
+        <div class="bar-radio" style={{marginTop: '1rem'}}></div>
         <svg id="bar-chart">
           <g className="g_1"></g>
         </svg>
