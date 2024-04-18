@@ -17,15 +17,8 @@ class Target extends Component {
   }
 
   componentDidUpdate() {
-    let data = this.props.data1;
 
-    let first_row = data[0];
-
-    let numeric_columns = Object.keys(first_row).filter(function (column) {
-      return !isNaN(first_row[column]);
-    });
-
-    numeric_columns.unshift("")
+    let numeric_columns = this.props.numeric_columns;
 
     d3.select("#target")
       .selectAll("option")
