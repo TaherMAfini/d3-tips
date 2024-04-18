@@ -96,7 +96,9 @@ class CorrMat extends Component {
       .join("g")
       .attr("class", "x-axis-g")
       .attr("transform", `translate(0, ${240})`)
-      .call(d3.axisBottom(x).tickSize(0));
+      .call(d3.axisBottom(x).tickSize(0))
+      .style("font-size", "15px")
+      .selectAll(".domain").remove()
 
     //Y axis
     let y_data = numeric_columns;
@@ -109,27 +111,85 @@ class CorrMat extends Component {
       .join("g")
       .attr("class", "y-axis-g")
       .attr("transform", `translate(0, 0)`)
-      .call(d3.axisLeft(y).tickSize(0));
+      .call(d3.axisLeft(y).tickSize(0))
+      .style("font-size", "15px")
+      .selectAll(".domain").remove()
 
-    container.selectAll("rect")
+
+    //Squares
+    container.selectAll(".rect_g")
       .data(grid)
-      .join("rect")
-      .attr("x", function (d) {
-        return d.x
-      })
-      .attr("y", function (d) {
-        return d.y
-      })
-      .attr("width", 80)
-      .attr("height", 80)
-      .attr("fill", function (d) {
-        return d3.interpolateBuGn(d.value)
-      })
-      .attr("stroke", "black")
-      .attr("stroke-width", 0.5)
-      .text(function (d) {
-        return d.value
-      })
+      .join(
+        enter => {
+
+          let g = enter.append("g")
+            .attr("class", "rect_g")
+
+          g.append("rect")
+            .attr("x", function (d) {
+              return d.x
+            })
+            .attr("y", function (d) {
+              return d.y
+            })
+            .attr("width", 80)
+            .attr("height", 80)
+            .attr("fill", function (d) {
+              return d3.interpolatePlasma(d.value)
+            })
+          
+          g.append("text")
+            .attr("x", function (d) {
+              return d.x + 40
+            })
+            .attr("y", function (d) {
+              return d.y + 40
+            })
+            .attr("text-anchor", "middle")
+            .attr("alignment-baseline", "middle")
+            .text(function (d) {
+              return d.value
+            })
+        }
+      )
+
+      //Colorbar
+      
+      let defs = container.append("defs")
+
+      let linearGradient = defs.append("linearGradient")
+        .attr("id", "linear-gradient")
+
+      linearGradient
+        .attr("x1", "0%")
+        .attr("y1", "0%")
+        .attr("x2", "0%")
+        .attr("y2", "100%")
+
+      linearGradient.selectAll("stop")
+        .data(d3.range(0, 1.1, 0.1))
+        .join("stop")
+        .attr("offset", d => `${d * 100}%`)
+        .attr("stop-color", d => d3.interpolatePlasma(d))
+
+      container.append("rect")
+        .attr("width", 20)
+        .attr("height", 240)
+        .style("fill", "url(#linear-gradient)")
+        .attr("transform", `rotate(180) translate(-320, -240)`)
+
+      
+      let colorbar = d3.scaleLinear()
+        .domain([1, -1])
+        .range([0, 240])
+
+      container.append("g")
+        .attr("transform", `translate(320, 0)`)
+        .call(d3.axisRight(colorbar).ticks(8).tickSize(0))
+        .style("font-size", "15px")
+        .selectAll(".domain").remove()
+
+
 
   }
 

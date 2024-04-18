@@ -51,12 +51,6 @@ class BarChart extends Component {
         width = 500 - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
 
-      let x = d3.scaleBand()
-        .range([0, width])
-        .padding(0.1);
-      let y = d3.scaleLinear()
-        .range([height, 0]);
-
 
       let container = d3.select("#bar-chart")
         .attr("width", width + margin.left + margin.right)
