@@ -11,7 +11,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {data: [], target: ""}
+    this.state = {data: [], target: "", numeric_columns: []}
   }
 
   componentDidMount() {
@@ -28,6 +28,13 @@ class App extends Component {
       }
     }).then(function (csv_data) {
       self.setState({data: csv_data})
+      let first_row = csv_data[0];
+
+      let numeric_columns = Object.keys(first_row).filter(function (column) {
+        return !isNaN(first_row[column]);
+      });
+      self.setState({target: numeric_columns[0]})
+      self.setState({numeric_columns: numeric_columns})
     })
     .catch(err => console.log(err))
   }
@@ -40,7 +47,7 @@ class App extends Component {
     return (
       <div className="container-fluid text-center">
         <div className="row">
-          <Target data1={this.state.data} selectedValue={this.handleTarget}></Target>
+          <Target data1={this.state.data} numeric_columns={this.state.numeric_columns} selectedValue={this.handleTarget}></Target>
         </div>
         <div className="row">
           <div className="col col">
