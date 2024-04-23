@@ -23,8 +23,13 @@ class BarChart extends Component {
     });
 
     if(document.querySelector(".bar-radio").innerHTML === "") {
-      cat_columns.forEach((col) => {
-        document.querySelector(".bar-radio").innerHTML += `<input type="radio" class="ms-2" name="bar-radio" value="${col}"></input><label class="me-2" for="${col}">${col}</label>`
+      cat_columns.forEach((col, i) => {
+        if (i === 0) {
+          document.querySelector(".bar-radio").innerHTML += `<input type="radio" class="ms-2" name="bar-radio" value="${col}" checked="true"></input><label class="me-2" for="${col}">${col}</label>`
+        } else {
+          document.querySelector(".bar-radio").innerHTML += `<input type="radio" class="ms-2" name="bar-radio" value="${col}"></input><label class="me-2" for="${col}">${col}</label>`
+        }
+        
       })
     }
     
@@ -33,7 +38,7 @@ class BarChart extends Component {
     })
 
     // Bar Chart
-    let selected = this.state.selected
+    let selected = this.state.selected === "" ? cat_columns[0] : this.state.selected
     let target = this.props.target
 
     if (selected !== "" && target !== "") {
@@ -75,7 +80,8 @@ class BarChart extends Component {
           .join("g")
           .attr("class", "x-axis-g")
           .attr("transform", `translate(0, ${height})`)
-          .call(d3.axisBottom(x_scale));
+          .call(d3.axisBottom(x_scale))
+          .attr('font-size', '15px')
 
         //Y axis
         let y_data = groupedData.map(d => d[1]);
@@ -99,6 +105,17 @@ class BarChart extends Component {
           .attr("width", x_scale.bandwidth())
           .attr("height", d => height - y_scale(d[1]))
           .attr("fill", "steelblue");
+
+        //Bar labels
+        container.selectAll(".bar-label")
+          .data(groupedData)
+          .join("text")
+          .attr("class", "bar-label")
+          .attr("x", d => x_scale(d[0]) + x_scale.bandwidth() / 2)
+          .attr("y", d => y_scale(d[1]) + 15)
+          .attr("text-anchor", "middle")
+          .text(d => d[1].toFixed(2))
+          .attr("fill", "#ededed");
 
         //Y axis label
         container.selectAll(".y-axis-label")
