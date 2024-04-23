@@ -25,7 +25,7 @@ class Scatter extends Component {
       });
 
       let margin = {top: 20, right: 20, bottom: 30, left: 40},
-        width = 800 - margin.left - margin.right,
+        width = 1000 - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
 
       let container = d3.select("#scatter")
@@ -95,7 +95,7 @@ class Scatter extends Component {
   render() {
     return (
       <div class="scatter">
-        <svg id="scatter" width="800" height="300">
+        <svg id="scatter" width="1000" height="300">
           <g className="g_3"></g>
         </svg>
       </div>
