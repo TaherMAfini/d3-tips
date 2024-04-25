@@ -23,8 +23,13 @@ class BarChart extends Component {
     });
 
     if(document.querySelector(".bar-radio").innerHTML === "") {
-      cat_columns.map((col) => {
-        document.querySelector(".bar-radio").innerHTML += `<input type="radio" class="ms-2" name="bar-radio" value="${col}"></input><label class="me-2" for="${col}">${col}</label>`
+      cat_columns.forEach((col, i) => {
+        if (i === 0) {
+          document.querySelector(".bar-radio").innerHTML += `<input type="radio" class="ms-2" name="bar-radio" value="${col}" checked="true"></input><label class="me-2" for="${col}">${col}</label>`
+        } else {
+          document.querySelector(".bar-radio").innerHTML += `<input type="radio" class="ms-2" name="bar-radio" value="${col}"></input><label class="me-2" for="${col}">${col}</label>`
+        }
+        
       })
     }
     
@@ -33,7 +38,7 @@ class BarChart extends Component {
     })
 
     // Bar Chart
-    let selected = this.state.selected
+    let selected = this.state.selected === "" ? cat_columns[0] : this.state.selected
     let target = this.props.target
 
     if (selected !== "" && target !== "") {
@@ -45,7 +50,11 @@ class BarChart extends Component {
         }
       });
 
-      let groupedData = d3.rollup(filteredData, v => d3.mean(v, d => d.target), d => d.selected)
+      let groupedData = d3.flatRollup(
+        filteredData,
+        (d) => d3.mean(d, (g) => g.target),
+        (d) => d.selected,
+      )
 
       let margin = {top: 20, right: 20, bottom: 30, left: 40},
         width = 500 - margin.left - margin.right,
@@ -60,7 +69,7 @@ class BarChart extends Component {
 
         //X axis
 
-        let x_data = Array.from(groupedData.keys());
+        let x_data = groupedData.map(d => d[0]);
         let x_scale = d3.scaleBand()
           .domain(x_data)
           .range([margin.left, width])
@@ -71,10 +80,11 @@ class BarChart extends Component {
           .join("g")
           .attr("class", "x-axis-g")
           .attr("transform", `translate(0, ${height})`)
-          .call(d3.axisBottom(x_scale));
+          .call(d3.axisBottom(x_scale))
+          .attr('font-size', '15px')
 
         //Y axis
-        let y_data = Array.from(groupedData.values());
+        let y_data = groupedData.map(d => d[1]);
         let y_scale = d3.scaleLinear()
           .domain([0, d3.max(y_data)])
           .range([height, 0]);
@@ -96,6 +106,17 @@ class BarChart extends Component {
           .attr("height", d => height - y_scale(d[1]))
           .attr("fill", "steelblue");
 
+        //Bar labels
+        container.selectAll(".bar-label")
+          .data(groupedData)
+          .join("text")
+          .attr("class", "bar-label")
+          .attr("x", d => x_scale(d[0]) + x_scale.bandwidth() / 2)
+          .attr("y", d => y_scale(d[1]) + 15)
+          .attr("text-anchor", "middle")
+          .text(d => d[1].toFixed(2))
+          .attr("fill", "#ededed");
+
         //Y axis label
         container.selectAll(".y-axis-label")
           .data([0])
@@ -111,7 +132,7 @@ class BarChart extends Component {
   render() {
     return (
       <div class="barChart">
-        <div class="bar-radio my-2"></div>
+        <div class="bar-radio" style={{marginTop: '1rem'}}></div>
         <svg id="bar-chart">
           <g className="g_1"></g>
         </svg>

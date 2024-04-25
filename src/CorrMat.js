@@ -88,7 +88,7 @@ class CorrMat extends Component {
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .select(".g_2")
-      .attr("transform", `translate(${130}, ${30})`);
+      .attr("transform", `translate(${110}, ${15})`);
 
     //X axis
     let x_data = numeric_columns;
@@ -209,7 +209,7 @@ class CorrMat extends Component {
   render() {
     return (
       <div class="corrMat">
-        <p><strong>Correlation Matrix</strong></p>
+        <p style={{marginTop: '1rem'}}><strong>Correlation Matrix</strong></p>
         <svg id="corr-matrix">
           <g className="g_2"></g>
         </svg>

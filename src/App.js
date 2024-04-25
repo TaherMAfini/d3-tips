@@ -54,7 +54,7 @@ class App extends Component {
           <Target data1={this.state.data} numeric_columns={this.state.numeric_columns} selectedValue={this.handleTarget}></Target>
         </div>
         <div className="row">
-          <div className="col col">
+          <div className="col">
             <BarChart data1={this.state.data} target={this.state.target}></BarChart>
           </div>
           <div className="col">
