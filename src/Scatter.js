@@ -97,6 +97,7 @@ class Scatter extends Component {
       <div class="scatter">
         <svg id="scatter" width="1000" height="300">
           <g className="g_3"></g>
+          {this.props.scatter_columns.length === 0 ? <text x="500" y="150" textAnchor="middle">Select cell in Correlation Matrix to visualize</text> : null}
         </svg>
       </div>
     );
